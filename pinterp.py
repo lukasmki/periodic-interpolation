@@ -83,7 +83,7 @@ def interp_linear_unwrap(
     dR = final.positions - initial.positions
 
     # unwrap translation
-    fR = dR / np.diag(final.cell)
+    fR = dR @ np.linalg.inv(final.cell)
     offsets = (final.pbc * np.floor(fR + 0.5)) @ final.cell
     dR -= offsets
 
