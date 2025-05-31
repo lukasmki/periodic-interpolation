@@ -1,6 +1,6 @@
 # Atomic Interpolation over Periodic Boundary Conditions
 
-This project provides a Python utility to perform interpolation between atomic structures under periodic boundary conditions (PBCs) using a scoring function inspired by [boid](https://en.wikipedia.org/wiki/Boids#Model_details) behavior rules. When linearly interpolating between two geometries in a periodic cell, there are two directions on which the geometries can be transformed, either by staying within the unit cell or by going through the boundary. Typically, only one of the two is a physical transformation. Without chemical bond information, the physically correct transformation can only be determined by visual inspection. The goal of this project is to determine the more physical transformation via heuristics by choosing between the wrapped and unwrapped interpolated paths based on separation, alignment, and cohesion metrics.
+This project performs linear interpolation between atomic structures under periodic boundary conditions (PBCs) using a scoring function inspired by [boid](https://en.wikipedia.org/wiki/Boids#Model_details) behavior rules. When linearly interpolating between two geometries in a periodic cell, there are two directions on which the geometries can be transformed, either by staying within the unit cell or by going through the boundary. Typically, only one of the two is a physical transformation. Without chemical bond information, the physically correct transformation can only be determined by visual inspection. The goal of this project is to determine the more physical transformation via heuristics by choosing between the wrapped and unwrapped interpolated paths based on separation, alignment, and cohesion metrics.
 
 ## Installation
 
@@ -39,6 +39,6 @@ The function `boid_score` assigns a score to a trajectory based on three rules o
 
 - Separation: Average of number of neighbors within < 0.25 Å over the trajectory
 - Alignment: Average of total cosine similarity between the interpolation step direction of nearest neighbors
-- Cohesion: Variance of the distance beween each atom and the centers of mass of its neighbors
+- Cohesion: Variance of the distance beween each atom and the center of mass of its neighbors
 
 The trajectory (wrapped vs unwrapped) with the lowest score in the most categories is chosen.
