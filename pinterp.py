@@ -18,7 +18,7 @@ def interp_periodic(
     function (lower is better). The function computes scores for three properties that
     approximate the "physicality" of the interpolated trajectory. The relative scores
     of the wrapped and unwrapped trajectories are compared, and the interpolated
-    trajectory with the lower score is returned.
+    trajectory with the lower score in the most categories is returned.
 
     Parameters
     ----------
@@ -36,24 +36,30 @@ def interp_periodic(
     s2, a2, c2 = boid_score(linear_unwrap_path)
 
     # normalize the scores per category then total all scores
-    scores = np.array([[s1, s2], [a1, a2], [c1, c2]])
-    scores = scores / np.sum(scores, -1, keepdims=True)
-    scores = np.sum(scores, 0)
+    init_scores = np.array([[s1, s2], [a1, a2], [c1, c2]])
+    norm_scores = init_scores / np.sum(init_scores, -1, keepdims=True)
+    scores = np.sum(norm_scores, 0)
 
     if verbose:
         print("Wrapped Path:")
         print(f"  separation: {s1:10f}")
         print(f"   alignment: {a1:10f}")
-        print(f"    cohesion: {s1:10f}")
+        print(f"    cohesion: {c1:10f}")
         print("Unwrapped Path:")
         print(f"  separation: {s2:10f}")
         print(f"   alignment: {a2:10f}")
-        print(f"    cohesion: {s2:10f}")
+        print(f"    cohesion: {c2:10f}")
         print("Final Scores:")
-        print(f"   wrapped path: {scores[0]:10f}")
-        print(f" unwrapped path: {scores[1]:10f}")
+        print("\t            wrapped path unwrapped path")
+        print(f"\tseparation: {norm_scores[0, 0]:12f} {norm_scores[0, 1]:14f}")
+        print(f"\t alignment: {norm_scores[1, 0]:12f} {norm_scores[1, 1]:14f}")
+        print(f"\t  cohesion: {norm_scores[2, 0]:12f} {norm_scores[2, 1]:14f}")
 
-    if scores[0] < scores[1]:
+    # compare scores in each category
+    linear_total = np.sum(norm_scores[:, 0] < norm_scores[:, 1])
+    linear_unwrap_total = 3 - linear_total
+
+    if linear_total > linear_unwrap_total:
         return linear_path
     else:
         # wrap atoms back into the box
@@ -108,9 +114,8 @@ def boid_score(traj: list[Atoms]):
     trajectories. In general, atoms in physical trajectories will have fewer collisions (1),
     will tend move in concert with their nearest neighbors (2), and retain molecular shape (3).
 
-    Each of the scores has a bounded minimum (zero) and unbounded maximum.
-    The scores depend on the number of frames, but the final relative scores in (interp_periodic)
-    ensure the scores are consistent across the number of interpolating frames.
+    The scores have different magnitudes but the final comparison of the lowest scores in the most
+    categories ensures each metric is treated with equal weight.
     """
     nframes, natoms = len(traj), len(traj[0])
     pos = np.array([atoms.positions for atoms in traj])
@@ -123,18 +128,18 @@ def boid_score(traj: list[Atoms]):
     idx = np.arange(natoms)
     Nij[:, idx, idx] = 0.0
 
-    # separation (total number of neighbors within 0.25 angstroms across trajectory)
+    # separation (average number of neighbors within 0.25 angstroms)
     collisions = smooth_step(Rij, cutoff=0.25)
     collisions[:, idx, idx] = 0.0
     collisions = np.sum(collisions, -1)
-    separation = np.sum(collisions, 0)
+    separation = np.mean(collisions, 0)
 
-    # alignment (cosine similarity of interpolation direction with neighbors)
+    # alignment (average cosine similarity of interpolation direction with neighbors)
     vel_ij = np.sum((vel[:, :, None, :]) * (vel[:, None, :, :]), -1) / (
-        vel_m[:, :, None] * vel_m[:, None, :]
+        vel_m[:, :, None] * vel_m[:, None, :] + np.finfo(np.float32).eps
     )
     alignment = np.sum((1 - vel_ij) * Nij[:-1], -1) / np.sum(Nij[:-1], -1)
-    alignment = np.sum(alignment, 0)
+    alignment = np.mean(alignment, 0)
 
     # cohesion (variance in distance to COM of nearest neighbors)
     masses = traj[0].get_masses()

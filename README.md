@@ -41,4 +41,4 @@ The function `boid_score` assigns a score to a trajectory based on three rules o
 - Alignment: Rewards similar direction of motion between neighboring atoms
 - Cohesion: Measures variance in distance to local centers of mass
 
-The trajectory (wrapped vs unwrapped) with the lower normalized sum of these scores is chosen.
+The trajectory (wrapped vs unwrapped) with the lowest score in the most categories is chosen.
