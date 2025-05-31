@@ -37,8 +37,8 @@ write("case1-periodic.xyz", trajectory)
 
 The function `boid_score` assigns a score to a trajectory based on three rules of flocking behavior:
 
-- Separation: Penalizes atoms that are too close (< 0.25 Å)
-- Alignment: Rewards similar direction of motion between neighboring atoms
-- Cohesion: Measures variance in distance to local centers of mass
+- Separation: Average of number of neighbors within < 0.25 Å over the trajectory
+- Alignment: Average of total cosine similarity between the interpolation step direction of nearest neighbors
+- Cohesion: Variance of the distance beween each atom and the centers of mass of its neighbors
 
 The trajectory (wrapped vs unwrapped) with the lowest score in the most categories is chosen.
