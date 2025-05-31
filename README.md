@@ -1,6 +1,6 @@
 # Atomic Interpolation over Periodic Boundary Conditions
 
-This project provides a Python utility to perform interpolation between atomic structures under periodic boundary conditions (PBCs) using a scoring function inspired by [boid](https://en.wikipedia.org/wiki/Boids#Model_details) behavior rules. The goal is to produce a trajectory that mimics physical atomic motion more closely than naive linear interpolation by choosing between the wrapped and unwrapped interpolated paths based on separation, alignment, and cohesion metrics.
+This project provides a Python utility to perform interpolation between atomic structures under periodic boundary conditions (PBCs) using a scoring function inspired by [boid](https://en.wikipedia.org/wiki/Boids#Model_details) behavior rules. When linearly interpolating between two geometries in a periodic cell, there are two lines on which the geometries can be transformed. Typically, only one of the two is a physical transformation. Without chemical bond information, the physically correct transformation can only be determined by visual inspection. The goal of this project is to determine the more physical transformation via heuristics by choosing between the wrapped and unwrapped interpolated paths based on separation, alignment, and cohesion metrics.
 
 ## Installation
 
