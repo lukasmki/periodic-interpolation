@@ -1,4 +1,4 @@
-# Atomic Interpolation over Periodic Boundary Conditions
+# Linear Interpolation over Periodic Boundary Conditions
 
 This project performs linear interpolation between atomic structures under periodic boundary conditions (PBCs) using a scoring function inspired by [boid](https://en.wikipedia.org/wiki/Boids#Model_details) behavior rules. When linearly interpolating between two geometries in a periodic cell, there are two directions on which the geometries can be transformed, either by staying within the unit cell or by going through the boundary. Typically, only one of the two is a physical transformation. Without chemical bond information, the physically correct transformation can only be determined by visual inspection. The goal of this project is to determine the more physical transformation via heuristics by choosing between the wrapped and unwrapped interpolated paths based on separation, alignment, and cohesion metrics.
 
